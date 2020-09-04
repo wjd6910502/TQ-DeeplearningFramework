@@ -1,0 +1,71 @@
+FROM gcc:4.9
+
+RUN mkdir /tmp/openmpi && \
+    cd /tmp/openmpi && \
+    wget https://www.open-mpi.org/software/ompi/v4.0/downloads/openmpi-4.0.0.tar.gz && \
+    tar zxf openmpi-4.0.0.tar.gz && \
+    cd openmpi-4.0.0 && \
+    ./configure --enable-orterun-prefix-by-default && \
+    make -j $(nproc) all && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/openmpi
+RUN rm -rf openmpi-4.0.0.tar.gz 
+
+#python3
+#RUN apt-get install openssl-devel bzip2-devel expat-devel gdbm-devel readline-devel sqlite-deve
+RUN wget https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz
+RUN tar -zxvf Python-3.6.1.tgz
+RUN mv Python-3.6.1 /usr/local/
+RUN cd /usr/local/Python-3.6.1 && \
+  ./configure && \
+  make && \
+  make install &&\
+  mv /usr/bin/python /usr/bin/python.2 && \
+  ln -sf /usr/local/bin/python3.6.1 /usr/bin/python
+RUN rm -rf Python-3.6.1.tgz
+
+#python3-pip
+#RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
+#python get-pip.py && \
+#rm -rf get-pip.py && \
+#pip3  install --upgrade pip
+
+RUN pip3 install tensorflow==1.12
+
+#numpy setup
+RUN pip3 uninstall numpy -y && \
+  pip3 install  numpy==1.16.4 
+
+#horovod setup
+RUN pip3 install --no-cache-dir horovod==0.19.0
+
+#keras setup
+RUN pip3 install keras==2.1.5
+
+# Install OpenSSH for MPI to communicate between containers
+RUN apt update
+RUN apt-get install -y --no-install-recommends openssh-client openssh-server && \
+  mkdir -p /var/run/sshd
+
+# Allow OpenSSH to talk to containers without asking for confirmation
+RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
+  echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
+  mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config
+
+RUN apt update
+RUN apt install vim -y
+
+#RUN pip3 config set global.index-url https://mirrors.cloud.tencent.com/pypi/simple && \
+#RUN pip3 install --upgrade pip
+
+#add yolo3 related
+#COPY ./requirements.txt /requirements.txt
+#RUN pip3 install pycurl==7.43.0.3 --compile --no-cache-dir
+#RUN pip3 install -r /requirements.txt
+
+RUN pip3 install Pillow
+RUN pip3 install matplotlib
+RUN pip3 install opencv-python
+RUN pip3 install requests
+RUN pip3 install boto3 

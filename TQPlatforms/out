@@ -1,0 +1,123 @@
+diff --git a/Dockerfile b/Dockerfile
+index c100369..eba3dfa 100644
+--- a/Dockerfile
++++ b/Dockerfile
+@@ -12,7 +12,7 @@ WORKDIR /app/server
+ #RUN cd ..
+ 
+ ENV LD_LIBRARY_PATH /usr/local/lib
+-
++RUN apt install vim -y
+ RUN ./build_linux_amd64.sh
+ 
+ 
+diff --git a/service/tq-service/resourcemanager/filemanager.go b/service/tq-service/resourcemanager/filemanager.go
+index aacfa91..a86efc6 100644
+--- a/service/tq-service/resourcemanager/filemanager.go
++++ b/service/tq-service/resourcemanager/filemanager.go
+@@ -392,4 +392,9 @@ func ExistDir(dirname string) bool {
+     return (err == nil || os.IsExist(err)) && fi.IsDir()
+ }
+ 
+-
++func (fm *FileManager) Copy(dst, src string) error{
++    command := "cp -rf  " + src + " " + dst
++    cmd := exec.Command("/bin/sh", "-c", command)
++    cmdErr := cmd.Run()
++    return cmdErr
++}
+diff --git a/service/tq-service/resourcemanager/resourcemager.go b/service/tq-service/resourcemanager/resourcemager.go
+index 9602577..644f243 100644
+--- a/service/tq-service/resourcemanager/resourcemager.go
++++ b/service/tq-service/resourcemanager/resourcemager.go
+@@ -138,7 +138,7 @@ func SliceData2S3(sliceCnt int, cosid string, tarfilename string) string{
+   }
+   util.Infof("************UnZip File Success*************")
+ 
+-    // 存放分割后的文件夹名字
++  // 存放分割后的文件夹名字
+   var listdestdir []string = make([]string, 0)
+   // 创建rank个文件夹cosid
+   subfile := []string{"Annotations","ImageSets","JPEGImages"}
+@@ -158,6 +158,8 @@ func SliceData2S3(sliceCnt int, cosid string, tarfilename string) string{
+ 
+   util.Infof("Copy split data........")
+   srcfile := cosid
++
++  // copy data 2 splitfile
+   CopySpliteData(srcfile,sliceCnt,listdestdir)
+ 
+   //压缩
+@@ -207,7 +209,7 @@ func CopySpliteData(sfile string, rank_size int, listdestdir []string ) bool {
+   chunksize := cnt/rank_size
+   util.Infof("cnt = %d, chunksize = %d",cnt,chunksize)
+ 
+-  // readdata2memory 
++   // readdata2memory 
+   slice := make([]string,0,cnt)
+   file,err := os.Open(raw_filename)
+ 	if err != nil{
+@@ -229,11 +231,20 @@ func CopySpliteData(sfile string, rank_size int, listdestdir []string ) bool {
+     iend := (i+1)*chunksize
+     s := slice[istart : iend]
+ 
++    //  copy laebl_map
++    labelfile := fmt.Sprintf("%v/VOCdevkit/label_map.json",sfile)
++    dstfile := fmt.Sprintf("%v/label_map.json",listdestdir[i])
++    fm.CopyFile(dstfile,labelfile)
++
+     // write2newslicefile
+     fname := fmt.Sprintf("%v/ImageSets/Main/train.txt",listdestdir[i])
+     fm.WriteMaptoFile(s,fname)
+ 
+-    otherfile := []string{ "back_train.txt","close_train.txt","trainval.txt","val.txt" }
++    fname = fmt.Sprintf("%v/ImageSets/Main/val.txt",listdestdir[i])
++    fm.WriteMaptoFile(s,fname)
++
++    // label_map.json 2
++    otherfile := []string{ "back_train.txt","close_train.txt","trainval.txt" }
+     for _,value := range otherfile{
+       // split文件
+       srcfile := fmt.Sprintf("%v/VOCdevkit/VOC2007/ImageSets/Main/%v",sfile,value)
+diff --git a/service/tq-service/resourcemanager/s3manager.go b/service/tq-service/resourcemanager/s3manager.go
+index ac0780b..f7bb449 100644
+--- a/service/tq-service/resourcemanager/s3manager.go
++++ b/service/tq-service/resourcemanager/s3manager.go
+@@ -30,7 +30,7 @@ func (sm *S3Manager) Init() {
+ 	sess,_ := session.NewSession(&aws.Config{
+ 		Credentials:      credentials.NewStaticCredentials(sm.access_key, sm.secret_key, ""),
+ 		Endpoint:         aws.String(sm.end_point),
+-		Region:           aws.String("us-east-1"),
++		Region:           aws.String("cn-north-1"),
+ 		DisableSSL:       aws.Bool(true),
+ 		S3ForcePathStyle: aws.Bool(false),
+ 	})
+diff --git a/test.go b/test.go
+index 4fe15ba..815bf27 100644
+--- a/test.go
++++ b/test.go
+@@ -31,7 +31,7 @@ func main() {
+    util.Initialize()
+    env.Init()
+    test_getcosdata()
+-   test_s3upload()
++   //test_s3upload()
+   }
+ 
+ func test_s3upload(){
+@@ -689,6 +689,7 @@ type S3Manager struct {
+ 	access_key string
+ 	secret_key string
+ 	end_point  string
++  default_bucket string
+   sess *session.Session
+ }
+ 
+@@ -697,6 +698,7 @@ func (sm *S3Manager) Init() {
+ 	sm.access_key = env.S3_ACCESSKEY
+ 	sm.secret_key = env.S3_SECRETKEY
+ 	sm.end_point = env.S3_ADDR //endpoint设置,不要动
++  sm.default_bucket = env.S3_BUCKET
+ 
+ 	sess,_ := session.NewSession(&aws.Config{
+ 		Credentials:      credentials.NewStaticCredentials(sm.access_key, sm.secret_key, ""),

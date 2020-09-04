@@ -1,0 +1,16 @@
+{
+  "image_name": "xxxx/xxxxx/xxxx",
+  "image_version" : "latest",
+  "start_cmd" : "sh start.sh",
+  "namespace" : "xxxxx",
+  "replicas" : "2",
+  "cpu_core" : "2",
+  "cpu_memory" : "4Gi",
+  "gpu_num" : "0",
+  "set_id": "Sxxxxxxx",
+  "config_id": "2b5480a8-c8c5-4f46-a6c6-7b2a7f7eddd3",
+  "ceph_path" : "/tq",
+  "mount_path" : "/data1/tq",
+  "label": "omt",
+  "project_name" : "tqp"
+}

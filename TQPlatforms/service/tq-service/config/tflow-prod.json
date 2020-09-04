@@ -1,0 +1,16 @@
+{
+  "image_name": "hub.oa.com/turinglab/dmlp-framework:1",
+  "image_version" : "latest",
+  "start_cmd" : "sh start.sh",
+  "namespace" : "turinglab",
+  "replicas" : "2",
+  "cpu_core" : "2",
+  "cpu_memory" : "4Gi",
+  "gpu_num" : "0",
+  "set_id": "SET-SH-18070618400212",
+  "config_id": "f69fb82e-f591-4c65-8d87-95a8795cc7af",
+  "ceph_path" : "/applicatons/tq",
+  "mount_path" : "/data1/tq",
+  "label": "omt",
+  "project_name" : "tqp"
+}

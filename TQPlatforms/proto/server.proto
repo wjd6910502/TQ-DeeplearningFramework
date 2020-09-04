@@ -1,0 +1,56 @@
+syntax = "proto3";
+    
+    // 定义你的包名
+   package server;
+
+   import "github.com/metaverse/truss/deftree/googlethirdparty/annotations.proto";
+ 
+  // 定义你的服务名
+    service tq {
+     // EchoRequest 和EchoResponse 在下面的代码中定义
+     rpc CreateTask (TaskRequest) returns (TaskResponse) {
+         option (google.api.http) = {
+         // http接口使用GET方法路由至/echo, 所有的字段都会放到query string中
+          post: "/tq/createtask"
+      body: "*"
+         };
+       }
+     rpc GetTaskStatus (TaskStatusRequest) returns (TaskStatusResponse) {
+         option (google.api.http) = {
+         // http接口使用GET方法路由至/echo, 所有的字段都会放到query string中
+          get: "/tq/gettask"
+         };
+       }
+  }
+    
+message TaskRequest {
+  string taskid       = 1;
+  string ipcnt        = 2;
+  string slotcnt      = 3;
+  string cpucnt       = 4;
+  string memsize      = 5;
+  string algtype      = 6;
+  string batchsize    = 7;
+  string epoch        = 8;
+  string learningrate = 9;
+  string loadpath     = 10;
+  string savepath     = 11;
+  string param1       = 12;
+  string param2       = 13;
+  }
+
+message TaskResponse{
+  string task_id  = 1;
+  string retcode  = 2;
+  string err_code = 3;
+}
+
+message TaskStatusRequest {
+      string task_id = 1;
+   }
+
+message TaskStatusResponse{
+	string task_id  = 1;
+	string status   = 2;
+	string err_code = 3;
+}

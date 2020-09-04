@@ -1,0 +1,45 @@
+<annotation>
+  <folder>VOC2007</folder>
+  <filename>353f6168-c678-11ea-98ea-467b66a0eedb.jpg</filename>
+  <source>
+    <database>The TuringLab Scene Recgnation Database</database>
+    <annotation>TuringLab</annotation>
+    <image>pelivisio</image>
+    <pelivisioid>353f6168-c678-11ea-98ea-467b66a0eedb</pelivisioid>
+  </source>
+  <owner>
+    <pelivisioid>2fd42f7e-c678-11ea-8aad-6a8db061103e</pelivisioid>
+    <name>pelivisio_xianzhzhang</name>
+  </owner>
+  <size>
+    <width>800</width>
+    <height>450</height>
+    <depth>3</depth>
+    <segmented>0</segmented>
+  </size>
+  <classify>?</classify>
+  <object>
+    <name>obj_2461529462936</name>
+    <difficult>0</difficult>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <bndbox>
+      <xmin>642</xmin>
+      <ymin>77</ymin>
+      <xmax>667</xmax>
+      <ymax>105</ymax>
+    </bndbox>
+  </object>
+  <object>
+    <name>obj_2461528281216</name>
+    <difficult>0</difficult>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <bndbox>
+      <xmin>188</xmin>
+      <ymin>139</ymin>
+      <xmax>371</xmax>
+      <ymax>345</ymax>
+    </bndbox>
+  </object>
+</annotation>

@@ -1,0 +1,10 @@
+# 1.主要隐藏基本hvd的部分接口
+# 2.将整个模型训练拆成不同的代码模块，可以保证后期用户扩展和可维护性
+# 3.可以动态调整模型训练参数，来进行参数调优
+# 4.数据keras加载部分和底层hvd实现打通，可以无重复加载循环加载数据，保证分布式每个worker的加载的数据都不一样
+
+本地测试:
+    1 启动进入docker ./autobuild start-local 
+    2 导入环境变量 export RESOURCE_APPLY_CONFIG_PATH=/app/dmlp-platform/config/tflow-dev.json
+    3 启动服务 ./tqserbice -s slave 
+    
